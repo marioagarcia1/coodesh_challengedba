@@ -1,0 +1,127 @@
+CREATE TABLE costumers (
+	costumer_id int identity(1,1) primary key,	first_name varchar (50),
+	last_name varchar (50),
+	phone varchar(20),
+	email varchar (100),
+	street varchar(100),
+	city varchar (50),
+	stat varchar(50),
+	zip_code varchar(10)
+	);
+
+	CREATE TABLE stores (
+	store_id int identity(1,1) primary key,
+	store_name varchar(10),
+	phone varchar(20),
+	email varchar(100),
+	city varchar(50),
+	stat varchar(50),
+	zip_code varchar(10)
+	);
+
+
+	CREATE TABLE staffs (
+	staff_id int identity(1,1) primary key,
+	first_name varchar(50),
+	last_name varchar(50),
+	email varchar(100),
+	phone varchar(20),
+	active bit,
+	store_id int,
+	manager_id int,
+
+	foreign key (store_id) references stores(store_id),
+	foreign key (manager_id) references staffs(staff_id)
+	);
+
+	
+
+	CREATE TABLE orders(
+	order_id int identity(1,1) primary key,
+	costumer_id int,
+	order_status varchar(20),
+	order_date date,
+	required_date date,
+	shipped_date date,
+	store_id int,
+	staff_id int,
+	
+	foreign key (costumer_id) references costumers(costumer_id),
+	foreign key (store_id) references stores(store_id),
+	foreign key (staff_id) references staffs(staff_id)
+	);
+
+	CREATE TABLE categories(
+	category_id int identity(1,1) primary key,
+	category_name varchar(50)
+	);
+
+	CREATE TABLE brands(
+	brand_id int identity(1,1) primary key,
+	brand_name varchar(50)
+	);
+
+	CREATE TABLE products (
+	product_id int identity(1,1) primary key,
+	product_name varchar(100),
+	brand_id int,
+	category_id int,
+	model_year int,
+	list_price decimal(10,2),
+	
+	foreign key (brand_id) references brands(brand_id),
+	foreign key (category_id) references categories(category_id)
+	);
+
+	CREATE TABLE order_itens(
+	order_id int,
+	item_id int identity(1,1),
+	product_id int,
+	quantity int,
+	list_price decimal(10,2),
+	discount decimal (5,2),
+
+	primary key (order_id,item_id),
+	foreign key (order_id) references orders(order_id),
+	foreign key (product_id) references products(product_id)
+	);
+
+	CREATE TABLE stocks(
+	store_id int,
+	product_id int,
+	quantity int,
+
+	primary key (store_id, product_id),
+	foreign key (store_id) references stores(store_id),
+	foreign key (product_id) references products(product_id)
+	);
+
+	SELECT c.costumer_id, c.first_name,c.phone,c.email 
+	FROM costumers c
+	left join orders o ON c.costumer_id = o.costumer_id
+	WHERE o.order_id IS NULL;
+
+	SELECT p.product_id, p.product_name, p.brand_id, p.category_id, p.list_price
+	FROM products p
+	left join order_itens oi ON p.product_id = oi.product_id
+	where oi.order_id IS NULL;
+
+	SELECT p.product_id, p.product_name,p.brand_id, p.category_id,p.model_year, p.list_price
+	FROM products p
+	left join stocks s ON p.product_id = s.product_id
+	WHERE s.quantity IS NULL OR s.quantity = 0;
+
+	SELECT s.store_id, s.store_name, b.brand_id,b.brand_name, sum(oi.quantity) AS total_vendas
+	FROM order_itens oi
+	join products p ON oi.product_id = p.product_id
+	join brands b ON p.brand_id = b.brand_id
+	join orders o ON oi.order_id = o.order_id
+	join stores s ON o.store_id = s.store_id
+	WHERE b.brand_id = (determinada_marca)
+	group by s.store_id, s.store_name, b.brand_id,b.brand_name
+	order by total_vendas DESC;
+
+	SELECT s.staff_id,s.first_name,s.last_name,s.store_id
+	FROM staffs s
+	left join orders o ON s.staff_id = o.staff_id
+	WHERE o.order_id IS NULL;
