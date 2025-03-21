@@ -1,4 +1,16 @@
-CREATE TABLE costumers (
+#######
+Criação do banco de dados bike_inc-sales e usar
+#######
+
+IF NOT EXISTS  CREATE DATABASE bike_inc_sales;
+
+USE bike_inc_sales;
+
+#######
+Criação da tabela costumers se não houver
+#######
+
+	IF NOT EXISTS  CREATE TABLE costumers (
 	costumer_id int identity(1,1) primary key,	first_name varchar (50),
 	last_name varchar (50),
 	phone varchar(20),
@@ -9,7 +21,10 @@ CREATE TABLE costumers (
 	zip_code varchar(10)
 	);
 
-	CREATE TABLE stores (
+#######
+Criação da tabela stores se não houver
+#######
+	IF NOT EXISTS CREATE TABLE stores (
 	store_id int identity(1,1) primary key,
 	store_name varchar(10),
 	phone varchar(20),
@@ -20,7 +35,10 @@ CREATE TABLE costumers (
 	);
 
 
-	CREATE TABLE staffs (
+#######
+Criação da tabela staffs se não houver
+#######
+	IF NOT EXISTS CREATE TABLE staffs (
 	staff_id int identity(1,1) primary key,
 	first_name varchar(50),
 	last_name varchar(50),
@@ -34,9 +52,11 @@ CREATE TABLE costumers (
 	foreign key (manager_id) references staffs(staff_id)
 	);
 
-	
+#######
+Criação da tabela orders se não houver
+#######
 
-	CREATE TABLE orders(
+	IF NOT EXISTS  CREATE TABLE orders(
 	order_id int identity(1,1) primary key,
 	costumer_id int,
 	order_status varchar(20),
@@ -51,17 +71,26 @@ CREATE TABLE costumers (
 	foreign key (staff_id) references staffs(staff_id)
 	);
 
-	CREATE TABLE categories(
+#######
+Criação da tabela categories se não houver
+#######
+	IF NOT EXISTS CREATE TABLE categories(
 	category_id int identity(1,1) primary key,
 	category_name varchar(50)
 	);
 
-	CREATE TABLE brands(
+#######
+Criação da tabela brands se não houver
+#######
+	IF NOT EXISTS CREATE TABLE brands(
 	brand_id int identity(1,1) primary key,
 	brand_name varchar(50)
 	);
 
-	CREATE TABLE products (
+#######
+Criação da tabela products se não houver
+#######
+	IF NOT EXISTS CREATE TABLE products (
 	product_id int identity(1,1) primary key,
 	product_name varchar(100),
 	brand_id int,
@@ -73,7 +102,10 @@ CREATE TABLE costumers (
 	foreign key (category_id) references categories(category_id)
 	);
 
-	CREATE TABLE order_itens(
+#######
+Criação da tabela order_itens se não houver
+#######
+	IF NOT EXISTS CREATE TABLE order_itens(
 	order_id int,
 	item_id int identity(1,1),
 	product_id int,
@@ -86,7 +118,10 @@ CREATE TABLE costumers (
 	foreign key (product_id) references products(product_id)
 	);
 
-	CREATE TABLE stocks(
+#######
+Criação da tabela stocks se não houver
+#######
+	IF NOT EXISTS CREATE TABLE stocks(
 	store_id int,
 	product_id int,
 	quantity int,
@@ -95,33 +130,3 @@ CREATE TABLE costumers (
 	foreign key (store_id) references stores(store_id),
 	foreign key (product_id) references products(product_id)
 	);
-
-	SELECT c.costumer_id, c.first_name,c.phone,c.email 
-	FROM costumers c
-	left join orders o ON c.costumer_id = o.costumer_id
-	WHERE o.order_id IS NULL;
-
-	SELECT p.product_id, p.product_name, p.brand_id, p.category_id, p.list_price
-	FROM products p
-	left join order_itens oi ON p.product_id = oi.product_id
-	where oi.order_id IS NULL;
-
-	SELECT p.product_id, p.product_name,p.brand_id, p.category_id,p.model_year, p.list_price
-	FROM products p
-	left join stocks s ON p.product_id = s.product_id
-	WHERE s.quantity IS NULL OR s.quantity = 0;
-
-	SELECT s.store_id, s.store_name, b.brand_id,b.brand_name, sum(oi.quantity) AS total_vendas
-	FROM order_itens oi
-	join products p ON oi.product_id = p.product_id
-	join brands b ON p.brand_id = b.brand_id
-	join orders o ON oi.order_id = o.order_id
-	join stores s ON o.store_id = s.store_id
-	WHERE b.brand_id = (determinada_marca)
-	group by s.store_id, s.store_name, b.brand_id,b.brand_name
-	order by total_vendas DESC;
-
-	SELECT s.staff_id,s.first_name,s.last_name,s.store_id
-	FROM staffs s
-	left join orders o ON s.staff_id = o.staff_id
-	WHERE o.order_id IS NULL;
