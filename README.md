@@ -8,4 +8,6 @@ This is a challenge by [Coodes](https://coodesh.com/)
 Utilizado o SQL para SQL Server onde pode ser adaptado para o MY SQL alterando IDENTITY para AUTO_INCREMENT
 
 Consultas  poderão ser realizadas com PYTHON  utilizando a lib pyodbc com as especificações das variáveis aportadas em arquivo seguro utilizando o seguinte script:
+Instale python na sua versão mais recente: https://www.python.org/downloads/release/python-3120/ 
+* Abra um novo terminal e insira: pip install pyodbc
 
