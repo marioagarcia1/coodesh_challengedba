@@ -1,0 +1,85 @@
+######
+Conexão com Base de dados bike_inc_sales utilizando pyodbc
+#####
+
+import pyodbc
+
+SERVER = '<server_adress>'
+DATABE = '<database-name>'
+USERNAME = '<username>'
+PASSWORD = '<password>'
+
+connectionString = f.DRIVER={{ODBC Driver 18 for SQL Server}};SERVER={SERVER};DATABASE={DATABASE);UID=(USERNAME};PWD={PASSWORD}'
+
+conn = pyodbc.connect(connectionString)
+
+######
+Definição de Consulta de clientes sem compra
+#####
+
+clientes_sem_compra = """
+  CREATE TEMP TABLE clientes_sem_compra AS
+SELECT c.costumer_id, c.first_name,c.phone,c.email 
+	FROM costumers c
+	left join orders o ON c.costumer_id = o.costumer_id
+	WHERE o.order_id IS NULL; 
+ """
+
+######
+Definição de Consulta de produtos sem compra
+#####
+
+produtos_sem_venda = """
+   CREATE TEMP TABLE produto_sem_venda AS
+SELECT p.product_id, p.product_name, p.brand_id, p.category_id, p.list_price
+	FROM products p
+	left join order_itens oi ON p.product_id = oi.product_id
+	where oi.order_id IS NULL;
+ """
+######
+Definição de Consulta de produtos sem estoque
+#####
+
+produtos_sem_estoque = """
+CREATE TEMP TABLE produtos_sem_estoque AS
+SELECT p.product_id, p.product_name,p.brand_id, p.category_id,p.model_year, p.list_price
+	FROM products p
+	left join stocks s ON p.product_id = s.product_id
+	WHERE s.quantity IS NULL OR s.quantity = 0;
+ """
+######
+Definição de Consulta  Agrupar a quantidade de vendas que uma determinada Marca por Loja
+#####
+
+grupo_quantidade_vendas_loja = """
+   CREATE TEMP TABLE grupo_quantidade_vendas_loja AS
+SELECT s.store_id, s.store_name, b.brand_id,b.brand_name, sum(oi.quantity) AS total_vendas
+	FROM order_itens oi
+	join products p ON oi.product_id = p.product_id
+	join brands b ON p.brand_id = b.brand_id
+	join orders o ON oi.order_id = o.order_id
+	join stores s ON o.store_id = s.store_id
+	WHERE b.brand_id = (determinada_marca)
+	group by s.store_id, s.store_name, b.brand_id,b.brand_name
+	order by total_vendas DESC;
+ """
+
+######
+Definição de Consulta  funcionario sem venda
+#####
+
+staff_sem_venda = """
+CREATE TEMP TABLE staff_sem_venda AS
+ SELECT s.staff_id,s.first_name,s.last_name,s.store_id
+	FROM staffs s
+	left join orders o ON s.staff_id = o.staff_id
+	WHERE o.order_id IS NULL;
+ """
+
+cursor = conn.cursor()
+cursor.execute (clientes_sem compra)
+  cursor.execute (produtos_se_venda)
+  cursor.execute (produtos_sem_estoque)
+  cursor.execute(grupo_quantidade_vendas_loja)
+  cursor.execute(staff_sem_venda)
+  conn.close()
