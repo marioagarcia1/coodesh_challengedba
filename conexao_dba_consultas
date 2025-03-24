@@ -6,10 +6,10 @@ import pyodbc
 from credentials import credentials
 
 
-SERVER = '<server_adress>'
-DATABE = '<database-name>'
-USERNAME = '<username>'
-PASSWORD = '<password>'
+SERVER = '{$server_adress}'
+DATABE = '{$database-name}'
+USERNAME = '{$username}'
+PASSWORD = '{$password}'
 
 connectionString = f.DRIVER={{ODBC Driver 18 for SQL Server}};SERVER={SERVER};DATABASE={DATABASE);UID=(USERNAME};PWD={PASSWORD}'
 
