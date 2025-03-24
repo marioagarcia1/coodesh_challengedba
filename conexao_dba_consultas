@@ -3,6 +3,8 @@ Conexão com Base de dados bike_inc_sales utilizando pyodbc
 #####
 
 import pyodbc
+from credentials import credentials
+
 
 SERVER = '<server_adress>'
 DATABE = '<database-name>'
